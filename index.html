@@ -1,0 +1,213 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>My Linktree</title>
+  <style>
+    :root {
+      --bg-color: #121212;
+      --card-color: #1e1e1e;
+      --hover-color: #2a2a2a;
+      --text-color: #fff;
+      --accent: #ff2d2d; /* Merah sosialis */
+    }
+
+    body {
+      margin: 0;
+      padding: 0;
+      font-family: 'Segoe UI', sans-serif;
+      background-color: var(--bg-color);
+      color: var(--text-color);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      min-height: 100vh;
+      padding: 2rem;
+      animation: fadeIn 1s ease-in;
+      position: relative;
+      overflow-x: hidden;
+    }
+
+    canvas {
+      position: fixed;
+      top: 0;
+      left: 0;
+      z-index: -1;
+      opacity: 0.3; /* Transparansi untuk tidak mengganggu konten */
+    }
+
+    @keyframes fadeIn {
+      from {opacity: 0;}
+      to {opacity: 1;}
+    }
+
+    .avatar {
+      width: 120px;
+      height: 120px;
+      border-radius: 50%;
+      border: 2px solid var(--accent);
+      margin-bottom: 1rem;
+      transition: transform 0.3s ease;
+    }
+
+    .avatar:hover {
+      transform: scale(1.05);
+    }
+
+    h1 {
+      margin: 0.5rem 0;
+      font-size: 1.8rem;
+    }
+
+    p {
+      color: #aaa;
+      font-size: 1rem;
+      text-align: center;
+      margin-top: 0;
+    }
+
+    .link-container {
+      display: flex;
+      flex-direction: column;
+      gap: 1rem;
+      width: 100%;
+      max-width: 500px;
+      margin-top: 2rem;
+    }
+
+    .link {
+      background-color: var(--card-color);
+      padding: 1rem;
+      border-radius: 10px;
+      text-align: center;
+      text-decoration: none;
+      color: var(--text-color);
+      font-weight: bold;
+      transition: background 0.3s, transform 0.2s;
+      box-shadow: 0 2px 5px rgba(255, 45, 45, 0.2);
+    }
+
+    .link:hover {
+      background-color: var(--hover-color);
+      transform: scale(1.03);
+    }
+
+    footer {
+      margin-top: auto;
+      padding: 1rem;
+      color: #777;
+      font-size: 0.8rem;
+    }
+
+    @media (max-width: 500px) {
+      h1 {
+        font-size: 1.4rem;
+      }
+
+      .link {
+        padding: 0.8rem;
+        font-size: 0.9rem;
+      }
+    }
+  </style>
+</head>
+<body>
+  <canvas id="bgCanvas"></canvas>
+  <img src="https://via.placeholder.com/120" alt="Avatar" class="avatar" />
+  <h1>@namakamu</h1>
+  <p>Temukan semua tautan penting saya di bawah ini</p>
+
+  <div class="link-container">
+    <a class="link" href="https://instagram.com/" target="_blank">📸 Instagram</a>
+    <a class="link" href="https://t.me/" target="_blank">💬 Telegram</a>
+    <a class="link" href="https://github.com/" target="_blank">💻 GitHub</a>
+    <a class="link" href="mailto:email@example.com">✉️ Email</a>
+  </div>
+
+  <footer>© 2025 namakamu</footer>
+
+  <script>
+    const canvas = document.getElementById('bgCanvas');
+    const ctx = canvas.getContext('2d');
+
+    // Set canvas size
+    function resizeCanvas() {
+      canvas.width = window.innerWidth;
+      canvas.height = window.innerHeight;
+    }
+    resizeCanvas();
+    window.addEventListener('resize', resizeCanvas);
+
+    // Simbol perjuangan
+    class Symbol {
+      constructor(x, y, type) {
+        this.x = x;
+        this.y = y;
+        this.type = type; // 'fist' atau 'star'
+        this.speed = Math.random() * 0.5 + 0.2;
+        this.size = Math.random() * 20 + 10;
+        this.opacity = Math.random() * 0.3 + 0.2;
+      }
+
+      draw() {
+        ctx.globalAlpha = this.opacity;
+        ctx.fillStyle = '#ff2d2d'; // Merah sosialis
+        if (this.type === 'fist') {
+          // Gambar tangan mengepal sederhana
+          ctx.beginPath();
+          ctx.rect(this.x, this.y, this.size * 0.6, this.size);
+          ctx.rect(this.x - this.size * 0.2, this.y + this.size * 0.2, this.size, this.size * 0.3);
+          ctx.fill();
+        } else {
+          // Gambar bintang
+          ctx.beginPath();
+          for (let i = 0; i < 5; i++) {
+            ctx.lineTo(
+              this.x + this.size * Math.cos((18 + i * 72) * Math.PI / 180),
+              this.y + this.size * Math.sin((18 + i * 72) * Math.PI / 180)
+            );
+            ctx.lineTo(
+              this.x + (this.size / 2) * Math.cos((54 + i * 72) * Math.PI / 180),
+              this.y + (this.size / 2) * Math.sin((54 + i * 72) * Math.PI / 180)
+            );
+          }
+          ctx.closePath();
+          ctx.fill();
+        }
+        ctx.globalAlpha = 1;
+      }
+
+      update() {
+        this.y += this.speed;
+        if (this.y > canvas.height + this.size) {
+          this.y = -this.size;
+          this.x = Math.random() * canvas.width;
+        }
+      }
+    }
+
+    // Buat array simbol
+    const symbols = [];
+    for (let i = 0; i < 20; i++) {
+      const type = Math.random() > 0.5 ? 'fist' : 'star';
+      symbols.push(new Symbol(
+        Math.random() * canvas.width,
+        Math.random() * canvas.height,
+        type
+      ));
+    }
+
+    // Animasi
+    function animate() {
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+      symbols.forEach(symbol => {
+        symbol.draw();
+        symbol.update();
+      });
+      requestAnimationFrame(animate);
+    }
+    animate();
+  </script>
+</body>
+</html>
